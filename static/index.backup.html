@@ -1,0 +1,2158 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LinkForge — Smart Autonomous SEO & Backlink Dashboard</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              500: '#22c55e',
+              600: '#16a34a',
+            }
+          },
+          fontFamily: {
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0b0f19;
+      color: #f1f5f9;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(16, 185, 129, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(56, 189, 248, 0.05) 0%, transparent 40%);
+      background-attachment: fixed;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+
+  <!-- ─── Top Navbar (Mobile Responsive) ─────────────────────────────────── -->
+  <header class="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3">
+      <!-- Main Row -->
+      <div class="flex items-center justify-between gap-2">
+        <!-- Logo & Branding -->
+        <div class="flex items-center space-x-2.5 shrink-0">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-cyan-500 p-0.5 shadow-lg shadow-emerald-500/20">
+            <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+              <i data-lucide="zap" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400"></i>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center space-x-1.5 sm:space-x-2">
+              <h1 class="text-sm sm:text-base font-bold tracking-tight text-white">LinkForge</h1>
+              <span class="text-[9px] sm:text-[10px] font-mono uppercase px-1.5 sm:px-2 py-0.2 rounded-full bg-emerald-950 border border-emerald-800 text-emerald-400 font-semibold">v2.5</span>
+            </div>
+            <p class="hidden sm:block text-[11px] text-slate-400">Website-Aware Guest Posting & Outreach Engine</p>
+          </div>
+        </div>
+
+        <!-- Center: Desktop Business Profile Switcher -->
+        <div class="hidden lg:flex items-center space-x-2 bg-slate-900/90 border border-slate-800 px-3 py-1.5 rounded-xl shadow-inner">
+          <i data-lucide="building-2" class="w-3.5 h-3.5 text-indigo-400"></i>
+          <span class="text-[11px] text-slate-400 font-medium">Business:</span>
+          <select id="header-profile-select" onchange="switchActiveProfile(this.value)" class="bg-transparent text-xs text-white font-semibold focus:outline-none cursor-pointer border-b border-transparent hover:border-slate-700 max-w-[180px] truncate">
+            <!-- Dynamically populated -->
+          </select>
+          <button onclick="openNewProfileModal()" title="Add New Business Profile" class="ml-1 px-1.5 py-0.5 rounded bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-800/80 text-[10px] font-medium text-indigo-300 transition">
+            + Add
+          </button>
+        </div>
+
+        <!-- Action Controls -->
+        <div class="flex items-center space-x-1.5 sm:space-x-2">
+          <!-- Live status pill -->
+          <div id="status-pill" class="flex items-center space-x-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full bg-slate-900 border border-slate-800 text-[11px] sm:text-xs text-slate-400">
+            <span class="w-2 h-2 rounded-full bg-slate-500" id="status-dot"></span>
+            <span id="status-text" class="hidden xs:inline">Idle</span>
+          </div>
+
+          <!-- Email & Outbox Button (Desktop) -->
+          <button onclick="openEmailModal()" class="hidden md:flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs text-slate-300 font-medium transition">
+            <i data-lucide="mail" class="w-3.5 h-3.5 text-blue-400"></i>
+            <span>Email Outreach</span>
+          </button>
+
+          <!-- Live logs modal trigger (Desktop) -->
+          <button onclick="openLogsModal()" class="hidden md:flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs text-slate-300 font-medium transition">
+            <i data-lucide="terminal" class="w-3.5 h-3.5 text-cyan-400"></i>
+            <span>Live Logs</span>
+          </button>
+
+          <!-- Run button -->
+          <button id="run-btn" onclick="startAutomation()" class="flex items-center space-x-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-950/40 transition">
+            <i data-lucide="play" class="w-3.5 h-3.5 fill-white"></i>
+            <span>Run</span>
+          </button>
+
+          <!-- Stop button (hidden initially) -->
+          <button id="stop-btn" onclick="stopAutomation()" class="hidden flex items-center space-x-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold shadow-lg shadow-rose-950/40 transition">
+            <i data-lucide="square" class="w-3.5 h-3.5 fill-white"></i>
+            <span>Stop</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Quick Toolbar (Shown on screens < lg) -->
+      <div class="flex lg:hidden items-center justify-between gap-2 mt-2 pt-2 border-t border-slate-800/60 overflow-x-auto custom-scrollbar">
+        <!-- Mobile Profile Quick Select -->
+        <div class="flex items-center space-x-1.5 bg-slate-900/90 border border-slate-800 px-2 py-1 rounded-lg text-xs shrink-0">
+          <i data-lucide="building-2" class="w-3 h-3 text-indigo-400"></i>
+          <select id="mobile-profile-select" onchange="switchActiveProfile(this.value)" class="bg-transparent text-[11px] text-white font-medium focus:outline-none cursor-pointer max-w-[140px] truncate">
+            <!-- Dynamically populated -->
+          </select>
+          <button onclick="openNewProfileModal()" class="text-[10px] text-indigo-400 font-bold px-1 hover:text-white">+</button>
+        </div>
+
+        <div class="flex items-center space-x-1.5 shrink-0">
+          <button onclick="openEmailModal()" class="flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-[11px] text-slate-300">
+            <i data-lucide="mail" class="w-3 h-3 text-blue-400"></i>
+            <span>Email</span>
+          </button>
+          <button onclick="openLogsModal()" class="flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-[11px] text-slate-300">
+            <i data-lucide="terminal" class="w-3 h-3 text-cyan-400"></i>
+            <span>Logs</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── Main Content ─────────────────────────────────────────────────────── -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- KPI Metrics Cards (Responsive Grid) -->
+    <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
+      <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-2.5 sm:p-3.5 backdrop-blur-sm">
+        <p class="text-[10px] sm:text-[11px] font-mono uppercase text-slate-400 truncate">Total Targets</p>
+        <p class="mt-0.5 sm:mt-1 text-lg sm:text-2xl font-bold font-mono text-white" id="stat-total">0</p>
+      </div>
+      <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-2.5 sm:p-3.5 backdrop-blur-sm">
+        <p class="text-[10px] sm:text-[11px] font-mono uppercase text-slate-400 truncate">Queue & Pending</p>
+        <p class="mt-0.5 sm:mt-1 text-lg sm:text-2xl font-bold font-mono text-slate-300" id="stat-pending">0</p>
+      </div>
+      <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-2.5 sm:p-3.5 backdrop-blur-sm border-amber-900/40 bg-amber-950/10 cursor-pointer" onclick="filterApprovals()">
+        <p class="text-[10px] sm:text-[11px] font-mono uppercase text-amber-400 flex items-center justify-between">
+          <span class="truncate">Approvals</span>
+          <i data-lucide="arrow-right" class="w-3 h-3 text-amber-400 shrink-0"></i>
+        </p>
+        <p class="mt-0.5 sm:mt-1 text-lg sm:text-2xl font-bold font-mono text-amber-400" id="stat-approvals">0</p>
+      </div>
+      <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-2.5 sm:p-3.5 backdrop-blur-sm border-emerald-900/40 bg-emerald-950/10">
+        <p class="text-[10px] sm:text-[11px] font-mono uppercase text-emerald-400 truncate">Verified Live</p>
+        <p class="mt-0.5 sm:mt-1 text-lg sm:text-2xl font-bold font-mono text-emerald-400" id="stat-live">0</p>
+      </div>
+      <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-2.5 sm:p-3.5 backdrop-blur-sm">
+        <p class="text-[10px] sm:text-[11px] font-mono uppercase text-cyan-400 truncate">Submitted</p>
+        <p class="mt-0.5 sm:mt-1 text-lg sm:text-2xl font-bold font-mono text-cyan-400" id="stat-submitted">0</p>
+      </div>
+      <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-2.5 sm:p-3.5 backdrop-blur-sm">
+        <p class="text-[10px] sm:text-[11px] font-mono uppercase text-rose-400 truncate">Failed / Blocked</p>
+        <p class="mt-0.5 sm:mt-1 text-lg sm:text-2xl font-bold font-mono text-rose-400" id="stat-failed">0</p>
+      </div>
+    </section>
+
+    <!-- Top Grid: Business Profile & Target URL Management -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Business Profile Panel (Multi-Business & Per-Business Gmail Credentials) -->
+      <div class="lg:col-span-2 bg-slate-900/60 border border-slate-800 rounded-2xl p-5 backdrop-blur-sm shadow-xl flex flex-col justify-between">
+        <div>
+          <!-- Header with Profile Selector & Quick Add -->
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-800/80">
+            <div class="flex items-center space-x-2.5">
+              <div class="p-1.5 rounded-lg bg-indigo-950/80 border border-indigo-800/80">
+                <i data-lucide="building-2" class="w-4 h-4 text-indigo-400"></i>
+              </div>
+              <div>
+                <h2 class="text-sm font-semibold text-white tracking-tight flex items-center space-x-2">
+                  <span>Business Profile & Dedicated Email Settings</span>
+                  <span id="profile-badge-active" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-950 border border-emerald-800 text-emerald-400 font-medium">Active</span>
+                </h2>
+                <p class="text-[11px] text-slate-400">Configure separate target payloads & Gmail credentials for each business</p>
+              </div>
+            </div>
+
+            <!-- Profile Switcher & Actions -->
+            <div class="flex items-center space-x-2">
+              <select id="main-profile-select" onchange="switchActiveProfile(this.value)" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white font-medium focus:outline-none focus:border-indigo-500">
+                <!-- Dynamically populated -->
+              </select>
+              <button onclick="openNewProfileModal()" class="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md transition">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                <span>New Business</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Row 1: Profile Name, Niche & Backlink Target -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+            <div>
+              <label class="block text-[11px] font-medium text-slate-300 mb-1">Business / Brand Name</label>
+              <input type="text" id="cfg-profile-name" placeholder="Afimah Clothing Store" class="w-full bg-slate-950/80 border border-slate-800 rounded-lg px-3 py-2 text-xs font-medium text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500">
+            </div>
+            <div>
+              <label class="block text-[11px] font-medium text-slate-300 mb-1">Niche / Industry Domain</label>
+              <input type="text" id="cfg-niche" placeholder="Fashion & Apparel / Lifestyle" class="w-full bg-slate-950/80 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500">
+            </div>
+            <div>
+              <label class="block text-[11px] font-medium text-slate-300 mb-1">Target Backlink URL</label>
+              <input type="text" id="cfg-backlink" placeholder="https://www.afimahclothingstore.com" class="w-full bg-slate-950/80 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500">
+            </div>
+          </div>
+
+          <!-- Row 2: Anchor Text, Outreach Email & 16-Digit App Password -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+            <div>
+              <label class="block text-[11px] font-medium text-slate-300 mb-1">Target Anchor Text</label>
+              <input type="text" id="cfg-anchor" placeholder="sustainable luxury apparel" class="w-full bg-slate-950/80 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500">
+            </div>
+            <div>
+              <label class="block text-[11px] font-medium text-slate-300 mb-1 flex items-center justify-between">
+                <span>Sender Gmail Address</span>
+                <span class="text-[10px] text-indigo-400">SMTP/IMAP</span>
+              </label>
+              <input type="email" id="cfg-email" placeholder="yourbusiness@gmail.com" class="w-full bg-slate-950/80 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500">
+            </div>
+            <div>
+              <label class="block text-[11px] font-medium text-slate-300 mb-1 flex items-center justify-between">
+                <span>16-Digit App Password</span>
+                <span class="text-[10px] text-slate-500">Google Security</span>
+              </label>
+              <div class="relative">
+                <input type="password" id="cfg-app-password" placeholder="••••••••" class="w-full bg-slate-950/80 border border-slate-800 rounded-lg px-3 py-2 pr-8 text-xs font-mono text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500">
+                <button type="button" onclick="toggleConfigPasswordVisibility()" class="absolute right-2.5 top-2 text-slate-500 hover:text-slate-300">
+                  <i data-lucide="eye" id="cfg-pw-eye" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 3: OpenAI API Key (For AI Email Writing) -->
+          <div class="mb-3">
+            <label class="block text-[11px] font-medium text-slate-300 mb-1 flex items-center justify-between">
+              <span class="flex items-center space-x-1.5">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i>
+                <span>OpenAI API Key (For AI-Powered Editor Approval Pitch)</span>
+              </span>
+              <span class="text-[10px] text-amber-400/90 font-mono">Optional — auto-reads from .env</span>
+            </label>
+            <div class="relative">
+              <input type="password" id="cfg-openai-key" placeholder="sk-proj-•••••••• (or leave blank to read from .env)" class="w-full bg-slate-950/80 border border-slate-800 rounded-lg px-3 py-2 pr-8 text-xs font-mono text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-500">
+              <button type="button" onclick="toggleOpenAIPasswordVisibility()" class="absolute right-2.5 top-2 text-slate-500 hover:text-slate-300">
+                <i data-lucide="eye" id="cfg-openai-eye" class="w-4 h-4"></i>
+              </button>
+            </div>
+            <p class="text-[10px] text-slate-500 mt-1">When set, LinkForge uses OpenAI to write a highly persuasive email asking the editor for guest post approval and publication.</p>
+          </div>
+
+          <!-- Row 4: Guidelines / Prompt -->
+          <div>
+            <label class="block text-[11px] font-medium text-slate-300 mb-1">Article Guidelines / Content Prompt</label>
+            <textarea id="cfg-guidelines" rows="2" placeholder="Authoritative guest article discussing bespoke tailoring, sustainable fabrics, and modern streetwear luxury trends..." class="w-full bg-slate-950/80 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500 resize-none"></textarea>
+          </div>
+        </div>
+
+        <!-- Action Footer (Mobile Responsive) -->
+        <div class="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between border-t border-slate-800/80 pt-3 gap-2.5">
+          <div class="flex items-center space-x-2">
+            <span id="cfg-feedback" class="text-xs text-emerald-400 font-medium hidden flex items-center space-x-1">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i>
+              <span>Profile saved</span>
+            </span>
+            <span id="cfg-test-feedback" class="text-xs hidden font-medium flex items-center space-x-1"></span>
+          </div>
+
+          <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 justify-end">
+            <button onclick="testActiveProfileEmail()" id="btn-quick-test-email" class="flex-1 sm:flex-initial px-3 py-2 sm:py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-medium border border-slate-700 transition flex items-center justify-center space-x-1.5">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+              <span>Test Email</span>
+            </button>
+            <button onclick="saveCurrentBusinessProfile()" class="flex-1 sm:flex-initial px-4 py-2 sm:py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md transition flex items-center justify-center space-x-1.5">
+              <i data-lucide="save" class="w-3.5 h-3.5"></i>
+              <span>Save Profile</span>
+            </button>
+            <button onclick="deleteCurrentProfile()" id="btn-delete-profile" title="Delete this business profile" class="p-2 sm:p-1.5 rounded-lg bg-slate-950 hover:bg-rose-950/60 border border-slate-800 text-slate-400 hover:text-rose-400 transition">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Target URL Management Panel (Excel / Bulk / Single) -->
+      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 backdrop-blur-sm shadow-xl flex flex-col justify-between">
+        <div>
+          <!-- Tab switch header -->
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-semibold text-white tracking-tight flex items-center space-x-2">
+              <i data-lucide="database" class="w-4 h-4 text-cyan-400"></i>
+              <span>Queue Targets</span>
+            </h3>
+            <div class="flex p-0.5 bg-slate-950 rounded-lg border border-slate-800 text-[11px] font-medium">
+              <button onclick="switchTab('excel')" id="tab-btn-excel" class="px-2.5 py-1 rounded-md bg-slate-800 text-white font-medium transition">Excel File</button>
+              <button onclick="switchTab('bulk')" id="tab-btn-bulk" class="px-2.5 py-1 rounded-md text-slate-400 hover:text-white transition">Bulk Text</button>
+              <button onclick="switchTab('single')" id="tab-btn-single" class="px-2.5 py-1 rounded-md text-slate-400 hover:text-white transition">Single URL</button>
+            </div>
+          </div>
+
+          <!-- Tab 1: Upload Excel / CSV -->
+          <div id="tab-excel" class="space-y-3">
+            <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleFileSelect(event)">
+            
+            <div id="drop-zone" onclick="document.getElementById('excel-file-input').click()" 
+                 class="border-2 border-dashed border-slate-800 hover:border-emerald-500/50 bg-slate-950/60 rounded-xl p-5 text-center cursor-pointer transition">
+              <div id="drop-zone-idle" class="flex flex-col items-center justify-center space-y-2">
+                <i data-lucide="file-spreadsheet" class="w-7 h-7 text-emerald-400"></i>
+                <p class="text-xs font-medium text-slate-200">Upload your Excel or CSV file</p>
+                <p class="text-[11px] text-slate-500">Supports <span class="text-slate-300 font-mono">.xlsx</span>, <span class="text-slate-300 font-mono">.xls</span>, <span class="text-slate-300 font-mono">.csv</span></p>
+              </div>
+              <div id="drop-zone-selected" class="hidden flex items-center justify-center space-x-3 text-slate-200">
+                <i data-lucide="file-check" class="w-6 h-6 text-emerald-400"></i>
+                <div class="text-left">
+                  <p class="text-xs font-semibold text-white" id="selected-filename">file.xlsx</p>
+                  <p class="text-[10px] text-slate-400" id="selected-filesize">0 KB</p>
+                </div>
+              </div>
+            </div>
+
+            <button onclick="uploadSpreadsheet()" id="upload-btn" class="w-full flex items-center justify-center space-x-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-950/40 transition">
+              <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+              <span>Import Targets from File</span>
+            </button>
+          </div>
+
+          <!-- Tab 2: Bulk Text Import -->
+          <div id="tab-bulk" class="hidden space-y-3">
+            <textarea id="bulk-text" rows="5" placeholder="https://apparelresources.com&#10;https://fashionunited.com&#10;https://websolindia.com" class="w-full bg-slate-950/80 border border-slate-800 rounded-lg p-2.5 text-xs font-mono text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-500 resize-none"></textarea>
+            <button onclick="importBulkText()" class="w-full flex items-center justify-center space-x-2 px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold shadow-lg shadow-cyan-950/40 transition">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i>
+              <span>Queue URL List</span>
+            </button>
+          </div>
+
+          <!-- Tab 3: Single URL -->
+          <div id="tab-single" class="hidden space-y-3">
+            <input type="text" id="single-url" placeholder="https://websolindia.com/write-for-us/" class="w-full bg-slate-950/80 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-100 placeholder-slate-600 focus:outline-none focus:border-emerald-500">
+            <button onclick="importSingleUrl()" class="w-full flex items-center justify-center space-x-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-950/40 transition">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Add Single Target</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="import-msg" class="mt-3 text-xs text-emerald-400 font-medium hidden"></div>
+      </div>
+    </section>
+
+    <!-- ─── Live Execution & Monitoring Table (Responsive) ─────────────────── -->
+    <section class="bg-slate-900/60 border border-slate-800 rounded-xl sm:rounded-2xl backdrop-blur-sm shadow-xl overflow-hidden">
+      <!-- Toolbar -->
+      <div class="p-3.5 sm:px-5 sm:py-4 border-b border-slate-800/80 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <div class="flex items-center justify-between space-x-3">
+          <div class="flex items-center space-x-2 sm:space-x-2.5">
+            <i data-lucide="list" class="w-4 h-4 text-emerald-400"></i>
+            <h2 class="text-xs sm:text-sm font-semibold text-white tracking-tight">Campaign Targets</h2>
+          </div>
+          <span class="text-[11px] font-mono text-slate-400" id="table-count">(0 targets)</span>
+        </div>
+
+        <div class="flex flex-wrap sm:flex-nowrap items-center gap-2">
+          <!-- Search input -->
+          <div class="relative w-full sm:w-48">
+            <i data-lucide="search" class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5"></i>
+            <input type="text" id="search-input" onkeyup="debounceSearch()" onpaste="return false;" placeholder="Search target, workflow..." autocomplete="off" spellcheck="false" readonly onfocus="this.removeAttribute('readonly');" class="w-full bg-slate-950 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+          </div>
+
+          <!-- Filters Group -->
+          <div class="flex items-center space-x-2 w-full sm:w-auto">
+            <!-- Workflow filter -->
+            <select id="workflow-filter" onchange="loadTargets()" autocomplete="off" class="flex-1 sm:flex-none bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-indigo-500 appearance-none cursor-pointer">
+              <option value="All">All Routes</option>
+              <option value="Workflow A">Route A (Direct)</option>
+              <option value="Workflow B">Route B (Account)</option>
+              <option value="Workflow C">Route C (Pitch)</option>
+              <option value="Workflow D">Route D (Approved)</option>
+              <option value="Workflow E">Route E (Review)</option>
+            </select>
+
+            <!-- Status filter -->
+            <select id="status-filter" onchange="loadTargets()" autocomplete="off" class="flex-1 sm:flex-none bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-indigo-500 appearance-none cursor-pointer">
+              <option value="All">All Statuses</option>
+              <option value="Needs Approval">Needs Approval</option>
+              <option value="Draft Ready">Draft Ready</option>
+              <option value="Pending Analysis">Pending Analysis</option>
+              <option value="Analyzing">Analyzing</option>
+              <option value="Verified Live">Verified Live</option>
+              <option value="Submitted">Submitted</option>
+              <option value="Pending Editorial Review">Pending Review</option>
+              <option value="Awaiting Editorial Reply">Awaiting Reply</option>
+              <option value="Approved by Editor">Approved by Editor</option>
+              <option value="Manual Required">Manual Required</option>
+              <option value="Failed - 403">Failed - 403</option>
+              <option value="Failed - Captcha">Failed - Captcha</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Skipped">Skipped</option>
+            </select>
+
+            <!-- Bulk Actions (shown when rows selected) -->
+            <div id="bulk-actions" class="hidden flex items-center space-x-1 pl-1 border-l border-slate-800 shrink-0">
+              <button onclick="runSelected()" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-emerald-400 font-medium">Run</button>
+              <button onclick="deleteSelected()" class="px-2 py-1 rounded bg-slate-800 hover:bg-rose-900/60 text-[11px] text-rose-400 font-medium">Del</button>
+            </div>
+
+            <!-- Clear queue button -->
+            <button onclick="clearAllTargets()" title="Clear all targets" class="p-1.5 rounded-lg bg-slate-950 hover:bg-rose-950/60 border border-slate-800 text-slate-400 hover:text-rose-400 transition shrink-0">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table (Mobile Horizontal Scrollable) -->
+      <div class="overflow-x-auto custom-scrollbar">
+        <table class="w-full text-left text-xs min-w-[700px]">
+          <thead class="bg-slate-950/60 text-slate-400 uppercase font-mono text-[10px] tracking-wider border-b border-slate-800/80">
+            <tr>
+              <th class="p-3.5 w-10 text-center">
+                <input type="checkbox" id="select-all-cb" onchange="toggleSelectAll(event)" class="rounded bg-slate-950 border-slate-800 text-emerald-500 focus:ring-0">
+              </th>
+              <th class="p-3.5 min-w-[170px]">Website Target</th>
+              <th class="p-3.5 min-w-[130px]">Workflow Route</th>
+              <th class="p-3.5 min-w-[130px]">Pipeline Status</th>
+              <th class="p-3.5 min-w-[120px]">Credentials</th>
+              <th class="p-3.5 min-w-[130px]">Live Post / URL</th>
+              <th class="p-3.5 min-w-[170px]">Automation Log / Evidence</th>
+              <th class="p-3.5 text-right min-w-[150px]">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="targets-body" class="divide-y divide-slate-800/60 text-slate-200">
+            <tr>
+              <td colspan="8" class="p-8 text-center text-slate-500 font-mono">
+                No targets queued yet. Upload an Excel spreadsheet (.xlsx, .csv) or paste URLs above.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ─── Website Analysis Report Modal ────────────────────────────────────── -->
+  <div id="analysis-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2.5 sm:p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh] sm:max-h-[90vh]">
+      <div class="px-5 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="search" class="w-4 h-4 text-cyan-400"></i>
+          <h3 class="text-sm font-semibold text-white" id="analysis-modal-title">Website Reconnaissance Report</h3>
+        </div>
+        <button onclick="closeAnalysisModal()" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="p-5 overflow-y-auto custom-scrollbar space-y-4 text-xs">
+        <div class="grid grid-cols-2 gap-3 bg-slate-950/60 p-3.5 rounded-xl border border-slate-800/80">
+          <div>
+            <span class="text-slate-400 block text-[11px]">Target Domain</span>
+            <span class="font-mono text-white text-xs" id="rep-target-url">—</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[11px]">Identified Guidelines Portal</span>
+            <a href="#" id="rep-guidelines-url" target="_blank" class="font-mono text-cyan-400 hover:underline text-xs flex items-center space-x-1">
+              <span id="rep-guidelines-url-text">—</span>
+              <i data-lucide="external-link" class="w-3 h-3 ml-1"></i>
+            </a>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[11px]">Detected Niche & Focus</span>
+            <span class="text-slate-200" id="rep-niche">—</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[11px]">Target Audience</span>
+            <span class="text-slate-200" id="rep-audience">—</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800/80">
+            <span class="text-slate-400 block text-[10px] uppercase font-mono">Submission Pricing</span>
+            <span class="font-semibold text-sm" id="rep-pricing">—</span>
+            <p class="text-[10px] text-slate-500 mt-0.5" id="rep-pricing-desc"></p>
+          </div>
+          <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800/80">
+            <span class="text-slate-400 block text-[10px] uppercase font-mono">Word Count Standard</span>
+            <span class="font-semibold text-sm text-slate-200" id="rep-words">—</span>
+          </div>
+          <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800/80">
+            <span class="text-slate-400 block text-[10px] uppercase font-mono">AI Content Policy</span>
+            <span class="font-semibold text-sm" id="rep-ai">—</span>
+          </div>
+        </div>
+
+        <div class="bg-slate-950/60 p-3.5 rounded-xl border border-slate-800/80">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-slate-400 text-[11px]">Recommended Workflow Route</span>
+            <span class="font-mono text-[10px] text-emerald-400" id="rep-confidence">Confidence: 90%</span>
+          </div>
+          <span class="font-semibold text-white text-xs block" id="rep-workflow">—</span>
+          <p class="text-[11px] text-slate-400 mt-1" id="rep-backlink-policy">—</p>
+        </div>
+
+        <div>
+          <span class="text-slate-400 block text-[11px] mb-1 font-medium">Guideline Evidence & Detected Policy Extracts:</span>
+          <div id="rep-evidence-list" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-[11px] text-slate-300 font-mono space-y-1">
+            <span class="text-slate-500">// No evidence snippets recorded.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="px-5 py-3 border-t border-slate-800 bg-slate-950 flex justify-end space-x-2">
+        <button onclick="closeAnalysisModal()" class="px-4 py-1.5 rounded-lg bg-slate-800 text-xs text-slate-200 font-medium">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Client Review & Approval Modal ───────────────────────────────────── -->
+  <div id="review-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2.5 sm:p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh] sm:max-h-[90vh]">
+      <div class="px-5 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="shield-alert" class="w-4 h-4 text-amber-400"></i>
+          <div>
+            <h3 class="text-sm font-semibold text-white">Client Approval & Content Review</h3>
+            <span class="text-[11px] text-slate-400" id="rev-modal-subtitle">Target Review</span>
+          </div>
+        </div>
+        <button onclick="closeReviewModal()" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <input type="hidden" id="rev-target-id">
+
+      <div class="p-5 overflow-y-auto custom-scrollbar space-y-4 text-xs">
+        <!-- Route Banner -->
+        <div id="rev-route-banner" class="p-3 rounded-xl border border-amber-800/60 bg-amber-950/20 text-amber-300 flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-400 shrink-0"></i>
+            <span id="rev-banner-text">Requires Client Authorization</span>
+          </div>
+          <span class="font-mono text-[10px] uppercase px-2 py-0.5 rounded bg-amber-950 border border-amber-800" id="rev-badge-workflow">Workflow A</span>
+        </div>
+
+        <!-- Tabs: Article vs Pitch Draft -->
+        <div class="flex border-b border-slate-800">
+          <button onclick="switchContentTab('article')" id="c-tab-article" class="px-4 py-2 text-xs font-semibold text-emerald-400 border-b-2 border-emerald-500">
+            Generated Guest Article
+          </button>
+          <button onclick="switchContentTab('pitch')" id="c-tab-pitch" class="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white">
+            Editorial Email Pitch
+          </button>
+        </div>
+
+        <!-- Article View/Editor -->
+        <div id="view-article" class="space-y-3">
+          <div>
+            <label class="block text-[11px] font-medium text-slate-400 mb-1">Article Title (H1)</label>
+            <input type="text" id="rev-art-title" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs font-semibold text-white">
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-[11px] font-medium text-slate-400">Article Content (Markdown / HTML)</label>
+              <span class="text-[11px] text-slate-500 font-mono" id="rev-word-count">~900 words</span>
+            </div>
+            <textarea id="rev-art-body" rows="12" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs font-mono text-slate-200 leading-relaxed"></textarea>
+          </div>
+        </div>
+
+        <!-- Pitch View/Editor -->
+        <div id="view-pitch" class="hidden space-y-3">
+          <div>
+            <label class="block text-[11px] font-medium text-slate-400 mb-1">Email Subject Line</label>
+            <input type="text" id="rev-pitch-subject" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs font-semibold text-white">
+          </div>
+          <div>
+            <label class="block text-[11px] font-medium text-slate-400 mb-1">Personalized Pitch Message</label>
+            <textarea id="rev-pitch-body" rows="10" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs font-mono text-slate-200 leading-relaxed"></textarea>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-medium text-slate-400 mb-1">Client Review Notes / Custom Instructions (Optional)</label>
+          <input type="text" id="rev-client-notes" placeholder="Approved. Please proceed with publication." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-slate-200">
+        </div>
+      </div>
+
+      <div class="px-5 py-3.5 border-t border-slate-800 bg-slate-950 flex flex-wrap items-center justify-between gap-2">
+        <button onclick="saveContentEdits()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 font-medium">
+          Save Edits
+        </button>
+
+        <div class="flex items-center space-x-2">
+          <button onclick="skipCurrentTarget()" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs text-slate-400 hover:text-white">
+            Skip Target
+          </button>
+          <button onclick="rejectCurrentTarget()" class="px-3 py-1.5 rounded-lg bg-rose-950/60 hover:bg-rose-900/80 border border-rose-800 text-xs text-rose-300 font-medium">
+            Reject
+          </button>
+          <button onclick="approveCurrentTarget()" class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs text-white font-semibold shadow-lg shadow-emerald-950/40">
+            Approve & Submit
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Email Settings & Inbox Polling Modal ─────────────────────────────── -->
+  <div id="email-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2.5 sm:p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh] sm:max-h-[90vh]">
+      <div class="px-5 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="mail" class="w-5 h-5 text-blue-400"></i>
+          <div>
+            <h3 class="text-sm font-semibold text-white">Gmail SMTP & IMAP Outreach Integration</h3>
+            <p class="text-[11px] text-slate-400">Real authenticated email dispatch and inbox response tracking</p>
+          </div>
+        </div>
+        <button onclick="closeEmailModal()" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-4 text-xs overflow-y-auto custom-scrollbar">
+        <!-- Configuration Card -->
+        <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="font-semibold text-slate-200 text-xs flex items-center space-x-1.5">
+              <i data-lucide="key" class="w-3.5 h-3.5 text-emerald-400"></i>
+              <span>Google Account Authentication</span>
+            </span>
+            <span class="text-[10px] font-mono text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">Gmail / Google Workspace</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-medium text-slate-300 mb-1">Gmail Address</label>
+              <input type="email" id="em-email-address" placeholder="yourname@gmail.com" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs font-mono text-slate-100 placeholder-slate-600 focus:outline-none focus:border-blue-500">
+            </div>
+            <div>
+              <label class="block text-[11px] font-medium text-slate-300 mb-1 flex items-center justify-between">
+                <span>Google App Password</span>
+                <span class="text-[10px] text-slate-500">(16 characters)</span>
+              </label>
+              <div class="relative">
+                <input type="password" id="em-app-password" placeholder="••••••••" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 pr-8 text-xs font-mono text-slate-100 placeholder-slate-600 focus:outline-none focus:border-blue-500">
+                <button type="button" onclick="toggleAppPasswordVisibility()" class="absolute right-2.5 top-2.5 text-slate-500 hover:text-slate-300">
+                  <i data-lucide="eye" id="em-pw-eye" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <p class="text-[11px] text-slate-400 bg-blue-950/20 p-2 rounded-lg border border-blue-900/30 flex items-start space-x-1.5">
+            <i data-lucide="info" class="w-3.5 h-3.5 text-blue-400 shrink-0 mt-0.5"></i>
+            <span><strong>How to generate:</strong> Go to your Google Account &gt; <em>Security</em> &gt; <em>2-Step Verification</em> &gt; <em>App Passwords</em>. Create a 16-character password (e.g. <code>abcd efgh ijkl mnop</code>). Spaces are cleaned automatically.</span>
+          </p>
+        </div>
+
+        <!-- Server Ports & Protocols (Collapsed or editable) -->
+        <div class="bg-slate-950/40 p-3.5 rounded-xl border border-slate-800/80">
+          <div class="flex items-center justify-between cursor-pointer" onclick="toggleAdvancedEmailSettings()">
+            <span class="font-medium text-slate-300 text-xs flex items-center space-x-1.5">
+              <i data-lucide="sliders" class="w-3.5 h-3.5 text-slate-400"></i>
+              <span>Server Connection Settings</span>
+            </span>
+            <span class="text-[11px] text-cyan-400 hover:underline" id="adv-toggle-text">Show Ports</span>
+          </div>
+
+          <div id="adv-email-settings" class="hidden mt-3 pt-3 border-t border-slate-800 grid grid-cols-2 gap-3 text-xs">
+            <div>
+              <label class="block text-[10px] text-slate-400 uppercase font-mono mb-1">SMTP Host (Outbound)</label>
+              <input type="text" id="em-smtp-host" value="smtp.gmail.com" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs font-mono text-slate-200">
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-400 uppercase font-mono mb-1">SMTP Port & Security</label>
+              <input type="number" id="em-smtp-port" value="587" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs font-mono text-slate-200">
+              <span class="text-[10px] text-slate-500 mt-0.5 block">Security: STARTTLS</span>
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-400 uppercase font-mono mb-1">IMAP Host (Inbound)</label>
+              <input type="text" id="em-imap-host" value="imap.gmail.com" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs font-mono text-slate-200">
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-400 uppercase font-mono mb-1">IMAP Port & Security</label>
+              <input type="number" id="em-imap-port" value="993" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs font-mono text-slate-200">
+              <span class="text-[10px] text-slate-500 mt-0.5 block">Security: SSL/TLS</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Diagnostics & Test Connection Section -->
+        <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="font-semibold text-slate-200 text-xs flex items-center space-x-1.5">
+              <i data-lucide="activity" class="w-3.5 h-3.5 text-cyan-400"></i>
+              <span>Connection Diagnostic & Verification Test</span>
+            </span>
+            <span class="text-[11px] text-slate-500">Separately tests 4 stages</span>
+          </div>
+
+          <div class="flex items-center space-x-2">
+            <input type="email" id="em-test-recipient" placeholder="Recipient (defaults to your Gmail address)" class="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-200 placeholder-slate-600 focus:outline-none focus:border-cyan-500">
+            <button onclick="runEmailDiagnosticTest()" id="btn-test-email" class="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold flex items-center space-x-1.5 shadow-lg shadow-cyan-950/40 transition">
+              <i data-lucide="play" class="w-3.5 h-3.5"></i>
+              <span>Test Email Connection</span>
+            </button>
+          </div>
+
+          <!-- Diagnostic Results Card (Initially hidden) -->
+          <div id="test-results-card" class="hidden mt-3 p-3.5 rounded-xl border border-slate-800 bg-slate-900/60 space-y-2">
+            <!-- Overall Banner -->
+            <div id="test-overall-banner" class="p-2.5 rounded-lg text-xs font-semibold flex items-center space-x-2">
+              <span id="test-overall-icon"></span>
+              <span id="test-overall-text">Diagnostic Running...</span>
+            </div>
+
+            <!-- 4 Stage Checklist -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 font-mono text-[11px]">
+              <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800" id="card-smtp-auth">
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-300 font-semibold">1. SMTP Auth</span>
+                  <span id="badge-smtp-auth" class="px-1.5 py-0.5 rounded text-[10px]">Testing...</span>
+                </div>
+                <p id="msg-smtp-auth" class="text-slate-400 text-[10px] mt-1 break-words">Connecting via STARTTLS...</p>
+              </div>
+
+              <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800" id="card-smtp-send">
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-300 font-semibold">2. Send Test Email</span>
+                  <span id="badge-smtp-send" class="px-1.5 py-0.5 rounded text-[10px]">Pending</span>
+                </div>
+                <p id="msg-smtp-send" class="text-slate-400 text-[10px] mt-1 break-words">Self-test message...</p>
+              </div>
+
+              <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800" id="card-imap-auth">
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-300 font-semibold">3. IMAP Auth</span>
+                  <span id="badge-imap-auth" class="px-1.5 py-0.5 rounded text-[10px]">Testing...</span>
+                </div>
+                <p id="msg-imap-auth" class="text-slate-400 text-[10px] mt-1 break-words">Connecting via SSL/TLS...</p>
+              </div>
+
+              <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800" id="card-imap-read">
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-300 font-semibold">4. INBOX Read Status</span>
+                  <span id="badge-imap-read" class="px-1.5 py-0.5 rounded text-[10px]">Pending</span>
+                </div>
+                <p id="msg-imap-read" class="text-slate-400 text-[10px] mt-1 break-words">Accessing mailbox...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-2 pt-1">
+          <input type="checkbox" id="em-auto-approve" class="rounded bg-slate-950 border-slate-800 text-emerald-500">
+          <label for="em-auto-approve" class="text-xs text-slate-300">Auto-approve free verified direct submissions (Skip approval gate for Workflow A)</label>
+        </div>
+
+        <div id="email-reply-msg" class="text-xs text-cyan-400 font-medium hidden"></div>
+      </div>
+
+      <div class="px-5 py-3 border-t border-slate-800 bg-slate-950 flex justify-between items-center">
+        <button onclick="pollInboxReplies()" class="px-3.5 py-1.5 rounded-lg bg-blue-950/80 hover:bg-blue-900 border border-blue-800 text-xs text-blue-300 font-medium flex items-center space-x-1.5 transition">
+          <i data-lucide="inbox" class="w-3.5 h-3.5"></i>
+          <span>Check Inbound Replies</span>
+        </button>
+        <button onclick="saveEmailConfig()" class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs text-white font-semibold transition shadow-lg shadow-emerald-950/40">
+          Save Settings
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Create New Business Profile Modal ─────────────────────────────────── -->
+  <div id="create-profile-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2.5 sm:p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh] sm:max-h-[90vh]">
+      <div class="px-5 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950">
+        <div class="flex items-center space-x-2.5">
+          <div class="p-1.5 rounded-lg bg-indigo-950/80 border border-indigo-800/80">
+            <i data-lucide="plus-circle" class="w-4 h-4 text-indigo-400"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-white">Create New Business Profile</h3>
+            <p class="text-[11px] text-slate-400">Add another brand with dedicated backlink payload & sender Gmail account</p>
+          </div>
+        </div>
+        <button onclick="closeNewProfileModal()" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-3.5 text-xs overflow-y-auto custom-scrollbar">
+        <div>
+          <label class="block text-[11px] font-medium text-slate-300 mb-1">Business Profile Name *</label>
+          <input type="text" id="new-prof-name" placeholder="e.g. TrendX Apparel / Digital Growth Agency" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500 font-medium">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] font-medium text-slate-300 mb-1">Niche / Industry</label>
+            <input type="text" id="new-prof-niche" placeholder="e.g. Technology / SEO / Fashion" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500">
+          </div>
+          <div>
+            <label class="block text-[11px] font-medium text-slate-300 mb-1">Backlink Destination URL</label>
+            <input type="text" id="new-prof-backlink" placeholder="https://yourbrand.com" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs font-mono text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] font-medium text-slate-300 mb-1">Target Anchor Text</label>
+            <input type="text" id="new-prof-anchor" placeholder="e.g. custom bespoke suits" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs font-mono text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500">
+          </div>
+          <div>
+            <label class="block text-[11px] font-medium text-slate-300 mb-1">Sender Gmail Address</label>
+            <input type="email" id="new-prof-email" placeholder="outreach@yourbrand.com" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs font-mono text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-medium text-slate-300 mb-1 flex items-center justify-between">
+            <span>16-Digit Google App Password</span>
+            <span class="text-[10px] text-slate-500">Security &gt; App Passwords</span>
+          </label>
+          <input type="text" id="new-prof-password" placeholder="e.g. abcd efgh ijkl mnop" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs font-mono text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-medium text-slate-300 mb-1 flex items-center justify-between">
+            <span class="flex items-center space-x-1">
+              <i data-lucide="sparkles" class="w-3 h-3 text-amber-400"></i>
+              <span>OpenAI API Key (Optional)</span>
+            </span>
+            <span class="text-[10px] text-slate-500">For AI Pitches</span>
+          </label>
+          <input type="text" id="new-prof-openai-key" placeholder="sk-proj-••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs font-mono text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-500">
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-medium text-slate-300 mb-1">Article Content Guidelines / Prompt</label>
+          <textarea id="new-prof-guidelines" rows="3" placeholder="Specific topics, brand introduction, editorial tone, and writing requirements for this business..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500 resize-none"></textarea>
+        </div>
+
+        <div class="flex items-center space-x-2 pt-1">
+          <input type="checkbox" id="new-prof-set-active" checked class="rounded bg-slate-950 border-slate-800 text-indigo-500 focus:ring-0">
+          <label for="new-prof-set-active" class="text-[11px] text-slate-300">Set as currently active business profile</label>
+        </div>
+      </div>
+
+      <div class="px-5 py-3.5 border-t border-slate-800 bg-slate-950 flex justify-end space-x-2">
+        <button onclick="closeNewProfileModal()" class="px-3.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs text-slate-300 font-medium transition">
+          Cancel
+        </button>
+        <button onclick="submitNewBusinessProfile()" class="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs text-white font-semibold transition shadow-md shadow-indigo-950/40">
+          Create & Switch Profile
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Live Execution Logs Modal ────────────────────────────────────────── -->
+  <div id="logs-modal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-2.5 sm:p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col max-h-[88vh] sm:max-h-[85vh]">
+      <div class="px-5 py-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-950">
+        <div class="flex items-center space-x-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <h3 class="text-sm font-semibold text-white">Live Execution Terminal</h3>
+        </div>
+        <button onclick="closeLogsModal()" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <div id="terminal-feed" class="flex-1 p-4 overflow-y-auto custom-scrollbar font-mono text-xs bg-slate-950 text-slate-300 space-y-1.5">
+        <div class="text-slate-500">// LinkForge Real-time Browser Automation Feed Initialized.</div>
+      </div>
+      <div class="px-5 py-3 border-t border-slate-800 bg-slate-950 flex justify-between items-center text-xs text-slate-400">
+        <span id="log-target-indicator">Idle</span>
+        <button onclick="clearTerminal()" class="text-slate-500 hover:text-slate-300">Clear Feed</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Manual Override Modal ────────────────────────────────────────────── -->
+  <div id="override-modal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-2.5 sm:p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl w-full max-w-lg p-4 sm:p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-sm font-semibold text-white" id="override-url-title">Manual Override</h3>
+        <button onclick="closeOverrideModal()" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <input type="hidden" id="override-id">
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Status</label>
+          <select id="override-status" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-slate-200">
+            <option value="Pending Analysis">Pending Analysis</option>
+            <option value="Draft Ready">Draft Ready</option>
+            <option value="Needs Approval">Needs Approval</option>
+            <option value="Ready to Submit">Ready to Submit</option>
+            <option value="Submitted">Submitted</option>
+            <option value="Registered & Submitted">Registered & Submitted</option>
+            <option value="Verified Live">Verified Live</option>
+            <option value="Awaiting Editorial Reply">Awaiting Reply</option>
+            <option value="Approved by Editor">Approved by Editor</option>
+            <option value="Manual Required">Manual Required</option>
+            <option value="Failed - 403">Failed - 403</option>
+            <option value="Failed - Captcha">Failed - Captcha</option>
+            <option value="Rejected">Rejected</option>
+            <option value="Skipped">Skipped</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Workflow Route</label>
+          <select id="override-workflow" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-slate-200">
+            <option value="Workflow A (Direct)">Workflow A (Direct Form)</option>
+            <option value="Workflow B (Account)">Workflow B (Account)</option>
+            <option value="Workflow C (Email Pitch)">Workflow C (Email Pitch)</option>
+            <option value="Workflow D (Approved by Editor)">Workflow D (Approved)</option>
+            <option value="Workflow E (Paid / Review)">Workflow E (Paid / Review)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Username</label>
+          <input type="text" id="override-username" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs font-mono text-slate-200">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Password</label>
+          <input type="text" id="override-password" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs font-mono text-slate-200">
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-slate-300 mb-1">Live Post URL</label>
+        <input type="text" id="override-live-url" placeholder="https://site.com/blog/my-guest-post" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs font-mono text-slate-200">
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-slate-300 mb-1">Log / Notes</label>
+        <textarea id="override-log" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-slate-200"></textarea>
+      </div>
+
+      <div class="flex justify-end space-x-2 pt-2 border-t border-slate-800">
+        <button onclick="closeOverrideModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 text-xs text-slate-300">Cancel</button>
+        <button onclick="saveOverride()" class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs text-white font-semibold">Save Override</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Core Logic (app.js) ──────────────────────────────────────────────── -->
+  <script>
+    let targets = [];
+    let selectedIds = new Set();
+    let currentTab = 'excel';
+    let currentContentTab = 'article';
+    let selectedFile = null;
+    let sseSource = null;
+
+    // Load initial data
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      loadBusinessConfig();
+      loadTargets();
+      loadStats();
+      initSSE();
+      setInterval(pollStatus, 3000);
+    });
+
+    // Tab switcher
+    function switchTab(tab) {
+      currentTab = tab;
+      ['excel', 'bulk', 'single'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tab);
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (t === tab) {
+          btn.className = 'px-2.5 py-1 rounded-md bg-slate-800 text-white font-medium transition';
+        } else {
+          btn.className = 'px-2.5 py-1 rounded-md text-slate-400 hover:text-white transition';
+        }
+      });
+      lucide.createIcons();
+    }
+
+    function switchContentTab(tab) {
+      currentContentTab = tab;
+      document.getElementById('view-article').classList.toggle('hidden', tab !== 'article');
+      document.getElementById('view-pitch').classList.toggle('hidden', tab !== 'pitch');
+      
+      const tabArt = document.getElementById('c-tab-article');
+      const tabPitch = document.getElementById('c-tab-pitch');
+      if (tab === 'article') {
+        tabArt.className = 'px-4 py-2 text-xs font-semibold text-emerald-400 border-b-2 border-emerald-500';
+        tabPitch.className = 'px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white';
+      } else {
+        tabArt.className = 'px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white';
+        tabPitch.className = 'px-4 py-2 text-xs font-semibold text-cyan-400 border-b-2 border-cyan-500';
+      }
+    }
+
+    // File handling
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (file) {
+        selectedFile = file;
+        document.getElementById('drop-zone-idle').classList.add('hidden');
+        document.getElementById('drop-zone-selected').classList.remove('hidden');
+        document.getElementById('selected-filename').textContent = file.name;
+        document.getElementById('selected-filesize').textContent = (file.size / 1024).toFixed(1) + ' KB';
+      }
+    }
+
+    async function uploadSpreadsheet() {
+      if (!selectedFile) {
+        alert('Please choose or drag an Excel (.xlsx, .xls) or CSV file first.');
+        return;
+      }
+      const btn = document.getElementById('upload-btn');
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Parsing & Validating...</span>`;
+      lucide.createIcons();
+
+      const fd = new FormData();
+      fd.append('file', selectedFile);
+
+      try {
+        const res = await fetch('/api/targets/upload', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Upload failed');
+
+        showImportMessage(`✓ ${data.message}`);
+        selectedFile = null;
+        document.getElementById('excel-file-input').value = '';
+        document.getElementById('drop-zone-idle').classList.remove('hidden');
+        document.getElementById('drop-zone-selected').classList.add('hidden');
+
+        await loadTargets();
+        await loadStats();
+        await loadBusinessConfig();
+      } catch (err) {
+        alert(err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="upload-cloud" class="w-4 h-4"></i><span>Import Targets from File</span>`;
+        lucide.createIcons();
+      }
+    }
+
+    function showImportMessage(msg) {
+      const el = document.getElementById('import-msg');
+      el.textContent = msg;
+      el.classList.remove('hidden');
+      setTimeout(() => el.classList.add('hidden'), 5000);
+    }
+
+    async function importBulkText() {
+      const text = document.getElementById('bulk-text').value.trim();
+      if (!text) return;
+      const res = await fetch('/api/targets/bulk-text', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
+      });
+      const data = await res.json();
+      document.getElementById('bulk-text').value = '';
+      showImportMessage(`✓ ${data.message}`);
+      loadTargets();
+      loadStats();
+    }
+
+    async function importSingleUrl() {
+      const website_url = document.getElementById('single-url').value.trim();
+      if (!website_url) return;
+      try {
+        const res = await fetch('/api/targets', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ website_url })
+        });
+        if (!res.ok) throw new Error((await res.json()).detail || 'Failed to add target');
+        document.getElementById('single-url').value = '';
+        showImportMessage('✓ Target added to database queue');
+        loadTargets();
+        loadStats();
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    // ─── Multi-Business Profiles Logic ──────────────────────────────────────────
+    let currentProfiles = [];
+    let currentActiveProfile = null;
+
+    async function loadBusinessProfiles() {
+      try {
+        const res = await fetch('/api/profiles');
+        currentProfiles = await res.json();
+      } catch (e) {
+        console.error('Failed to load profiles:', e);
+        return;
+      }
+
+      currentActiveProfile = currentProfiles.find(p => p.is_active) || currentProfiles[0];
+
+      // Populate header & main dropdowns
+      const headerSelect = document.getElementById('header-profile-select');
+      const mobileSelect = document.getElementById('mobile-profile-select');
+      const mainSelect = document.getElementById('main-profile-select');
+
+      const optionsHtml = currentProfiles.map(p => 
+        `<option value="${p.id}" ${p.id === currentActiveProfile.id ? 'selected' : ''}>${p.name || 'Business #' + p.id} (${p.niche || 'General'})</option>`
+      ).join('');
+
+      if (headerSelect) headerSelect.innerHTML = optionsHtml;
+      if (mobileSelect) mobileSelect.innerHTML = optionsHtml;
+      if (mainSelect) mainSelect.innerHTML = optionsHtml;
+
+      // Populate form fields with current active profile
+      renderProfileForm(currentActiveProfile);
+      lucide.createIcons();
+    }
+
+    function renderProfileForm(profile) {
+      if (!profile) return;
+      document.getElementById('cfg-profile-name').value = profile.name || '';
+      document.getElementById('cfg-niche').value = profile.niche || '';
+      document.getElementById('cfg-backlink').value = profile.backlink_url || '';
+      document.getElementById('cfg-anchor').value = profile.anchor_text || '';
+      document.getElementById('cfg-email').value = profile.default_email || '';
+      document.getElementById('cfg-app-password').value = profile.smtp_pass || '';
+      document.getElementById('cfg-guidelines').value = profile.article_guidelines || '';
+      document.getElementById('cfg-openai-key').value = profile.openai_api_key || '';
+
+      const delBtn = document.getElementById('btn-delete-profile');
+      if (delBtn) {
+        delBtn.style.display = currentProfiles.length > 1 ? 'inline-flex' : 'none';
+      }
+    }
+
+    async function switchActiveProfile(profileId) {
+      if (!profileId) return;
+      try {
+        const res = await fetch(`/api/profiles/${profileId}/activate`, { method: 'POST' });
+        if (!res.ok) throw new Error('Failed to activate profile');
+        await loadBusinessProfiles();
+        await loadTargets();
+        await loadStats();
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    async function saveCurrentBusinessProfile() {
+      if (!currentActiveProfile) return;
+      const appPass = document.getElementById('cfg-app-password').value.trim();
+      const aiKey = document.getElementById('cfg-openai-key').value.trim();
+      const payload = {
+        name: document.getElementById('cfg-profile-name').value.trim() || 'Business Profile',
+        niche: document.getElementById('cfg-niche').value.trim(),
+        backlink_url: document.getElementById('cfg-backlink').value.trim(),
+        anchor_text: document.getElementById('cfg-anchor').value.trim(),
+        default_email: document.getElementById('cfg-email').value.trim(),
+        article_guidelines: document.getElementById('cfg-guidelines').value.trim(),
+      };
+      if (appPass && appPass !== '••••••••') {
+        payload.smtp_pass = appPass;
+        payload.imap_pass = appPass;
+      }
+      if (aiKey && !aiKey.includes('••••')) {
+        payload.openai_api_key = aiKey;
+      }
+
+      try {
+        const res = await fetch(`/api/profiles/${currentActiveProfile.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error('Failed to update business profile');
+        const fb = document.getElementById('cfg-feedback');
+        fb.classList.remove('hidden');
+        setTimeout(() => fb.classList.add('hidden'), 3000);
+        await loadBusinessProfiles();
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    // Quick email diagnostic directly from the business profile card
+    async function testActiveProfileEmail() {
+      if (!currentActiveProfile) return;
+      const btn = document.getElementById('btn-quick-test-email');
+      const feedback = document.getElementById('cfg-test-feedback');
+      const originalHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i><span>Testing...</span>`;
+      lucide.createIcons();
+
+      // Save changes first
+      await saveCurrentBusinessProfile();
+
+      try {
+        const res = await fetch('/api/email/test', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ profile_id: currentActiveProfile.id })
+        });
+        const data = await res.json();
+        feedback.classList.remove('hidden');
+        if (data.overall_success) {
+          feedback.className = 'text-xs text-emerald-400 font-semibold flex items-center space-x-1';
+          feedback.innerHTML = `<i data-lucide="check-circle" class="w-3.5 h-3.5"></i><span>✓ Gmail & App Password Verified!</span>`;
+        } else {
+          feedback.className = 'text-xs text-rose-400 font-semibold flex items-center space-x-1';
+          feedback.innerHTML = `<i data-lucide="alert-circle" class="w-3.5 h-3.5"></i><span>✗ ${data.error_summary || 'Connection failed'}</span>`;
+        }
+        lucide.createIcons();
+        setTimeout(() => feedback.classList.add('hidden'), 8000);
+      } catch (err) {
+        alert('Test failed: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+        lucide.createIcons();
+      }
+    }
+
+    function toggleConfigPasswordVisibility() {
+      const input = document.getElementById('cfg-app-password');
+      const icon = document.getElementById('cfg-pw-eye');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.setAttribute('data-lucide', 'eye-off');
+      } else {
+        input.type = 'password';
+        icon.setAttribute('data-lucide', 'eye');
+      }
+      lucide.createIcons();
+    }
+
+    function toggleOpenAIPasswordVisibility() {
+      const input = document.getElementById('cfg-openai-key');
+      const icon = document.getElementById('cfg-openai-eye');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.setAttribute('data-lucide', 'eye-off');
+      } else {
+        input.type = 'password';
+        icon.setAttribute('data-lucide', 'eye');
+      }
+      lucide.createIcons();
+    }
+
+    function openNewProfileModal() {
+      document.getElementById('new-prof-name').value = '';
+      document.getElementById('new-prof-niche').value = '';
+      document.getElementById('new-prof-backlink').value = '';
+      document.getElementById('new-prof-anchor').value = '';
+      document.getElementById('new-prof-email').value = '';
+      document.getElementById('new-prof-password').value = '';
+      document.getElementById('new-prof-guidelines').value = '';
+      document.getElementById('new-prof-openai-key').value = '';
+      document.getElementById('new-prof-set-active').checked = true;
+      document.getElementById('create-profile-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeNewProfileModal() {
+      document.getElementById('create-profile-modal').classList.add('hidden');
+    }
+
+    async function submitNewBusinessProfile() {
+      const name = document.getElementById('new-prof-name').value.trim();
+      if (!name) {
+        alert('Please enter a Business Profile Name.');
+        return;
+      }
+      const payload = {
+        name: name,
+        niche: document.getElementById('new-prof-niche').value.trim(),
+        backlink_url: document.getElementById('new-prof-backlink').value.trim(),
+        anchor_text: document.getElementById('new-prof-anchor').value.trim(),
+        default_email: document.getElementById('new-prof-email').value.trim(),
+        smtp_pass: document.getElementById('new-prof-password').value.trim(),
+        article_guidelines: document.getElementById('new-prof-guidelines').value.trim(),
+        openai_api_key: document.getElementById('new-prof-openai-key').value.trim(),
+        set_active: document.getElementById('new-prof-set-active').checked
+      };
+
+      try {
+        const res = await fetch('/api/profiles', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error('Failed to create business profile');
+        closeNewProfileModal();
+        await loadBusinessProfiles();
+        await loadTargets();
+        await loadStats();
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    async function deleteCurrentProfile() {
+      if (!currentActiveProfile) return;
+      if (!confirm(`Are you sure you want to delete the business profile "${currentActiveProfile.name}"?`)) return;
+
+      try {
+        const res = await fetch(`/api/profiles/${currentActiveProfile.id}`, { method: 'DELETE' });
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.detail || 'Could not delete profile');
+        }
+        await loadBusinessProfiles();
+        await loadTargets();
+        await loadStats();
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    // Backward-compatible alias
+    async function loadBusinessConfig() {
+      await loadBusinessProfiles();
+    }
+
+    // Filter shortcuts
+    function filterApprovals() {
+      document.getElementById('status-filter').value = 'Needs Approval';
+      document.getElementById('workflow-filter').value = 'All';
+      loadTargets();
+    }
+
+    // Targets Table
+    async function loadTargets() {
+      const status = document.getElementById('status-filter').value;
+      const workflow = document.getElementById('workflow-filter').value;
+      const search = document.getElementById('search-input').value.trim();
+      const params = new URLSearchParams();
+      if (status !== 'All') params.append('status', status);
+      if (workflow !== 'All') params.append('workflow', workflow);
+      if (search) params.append('search', search);
+
+      const res = await fetch(`/api/targets?${params.toString()}`);
+      targets = await res.json();
+
+      document.getElementById('table-count').textContent = `(${targets.length} targets)`;
+      renderTargets();
+    }
+
+    function renderTargets() {
+      const tbody = document.getElementById('targets-body');
+      if (targets.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="p-8 text-center text-slate-500 font-mono">
+              No targets found for current criteria.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = targets.map(t => {
+        const isSelected = selectedIds.has(t.id);
+        const statusBadge = getStatusBadge(t.status);
+        const workflowBadge = getWorkflowBadge(t.workflow);
+        const passDisplay = t.password ? `<span class="font-mono text-slate-400" id="pw-${t.id}">••••••••</span> <button onclick="togglePassword(${t.id}, '${t.password}')" class="text-slate-500 hover:text-slate-300 ml-1"><i data-lucide="eye" class="w-3 h-3 inline"></i></button>` : '—';
+        // Determine what to show in the "Live Post / URL" column
+        const isPendingReview = ['Pending Editorial Review', 'Submitted', 'Awaiting Editorial Reply'].includes(t.status);
+        let liveLink;
+        if (t.live_post_url && !isPendingReview) {
+          // Real confirmed published URL — show as clickable link
+          liveLink = `<a href="${t.live_post_url}" target="_blank" class="inline-flex items-center space-x-1 text-emerald-400 hover:underline font-mono text-[11px] truncate max-w-[170px]" title="Open published article">${t.live_post_url.replace(/^https?:\/\//, '')} <i data-lucide="external-link" class="w-3 h-3 ml-0.5"></i></a>`;
+        } else if (isPendingReview) {
+          // Article submitted but not yet published — show a badge, not a blank-page link
+          liveLink = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-950/60 border border-amber-800/60 text-amber-300" title="Article submitted — awaiting editorial review before publication"><i data-lucide="clock" class="w-3 h-3"></i> Awaiting Review</span>`;
+        } else {
+          liveLink = '<span class="text-slate-600">—</span>';
+        }
+
+        const isApprovalPending = t.status === 'Needs Approval' || t.status === 'Draft Ready' || t.approval_status === 'Pending';
+
+        return `
+          <tr class="hover:bg-slate-900/40 transition ${isSelected ? 'bg-emerald-950/20' : ''}">
+            <td class="p-3.5 text-center">
+              <input type="checkbox" onchange="toggleSelect(${t.id})" ${isSelected ? 'checked' : ''} class="rounded bg-slate-950 border-slate-800 text-emerald-500 focus:ring-0">
+            </td>
+            <td class="p-3.5 max-w-[210px]">
+              <div class="font-medium text-white truncate">${t.website_name || t.website_url.replace(/^https?:\/\//, '')}</div>
+              <a href="${t.website_url}" target="_blank" class="text-[11px] text-slate-500 hover:text-slate-400 font-mono truncate block">${t.website_url}</a>
+              ${t.category ? `<span class="inline-block mt-0.5 text-[10px] text-slate-400 bg-slate-800/80 px-1.5 py-0.2 rounded">${t.category}</span>` : ''}
+            </td>
+            <td class="p-3.5 whitespace-nowrap">
+              ${workflowBadge}
+            </td>
+            <td class="p-3.5 whitespace-nowrap">${statusBadge}</td>
+            <td class="p-3.5 whitespace-nowrap">
+              ${t.username ? `<div><span class="font-mono text-slate-300 text-[11px]">${t.username}</span><div class="text-[11px]">${passDisplay}</div></div>` : '<span class="text-slate-600">—</span>'}
+            </td>
+            <td class="p-3.5">${liveLink}</td>
+            <td class="p-3.5 max-w-[220px]">
+              <p class="text-[11px] text-slate-400 truncate" title="${t.error_log || t.notes || ''}">
+                ${t.error_log || t.notes || '<span class="text-slate-600">—</span>'}
+              </p>
+            </td>
+            <td class="p-3.5 text-right whitespace-nowrap">
+              <div class="flex items-center justify-end space-x-1">
+                ${t.analysis_report_parsed ? `<button onclick="openAnalysisModal(${t.id})" title="View Website Analysis Report" class="p-1.5 rounded-md hover:bg-slate-800 text-cyan-400 hover:text-cyan-300"><i data-lucide="file-search" class="w-4 h-4"></i></button>` : ''}
+                
+                <button onclick="openReviewModal(${t.id})" title="Review Article & Editorial Pitch" class="p-1.5 rounded-md hover:bg-slate-800 ${isApprovalPending ? 'text-amber-400 animate-pulse' : 'text-slate-400 hover:text-white'}"><i data-lucide="file-text" class="w-4 h-4"></i></button>
+
+                ${t.live_post_url ? `<button onclick="verifyLive(${t.id})" title="Verify Backlink Live" class="p-1.5 rounded-md hover:bg-slate-800 text-slate-400 hover:text-emerald-400"><i data-lucide="shield-check" class="w-4 h-4"></i></button>` : ''}
+                
+                <button onclick="retryTarget(${t.id})" title="Run single target" class="p-1.5 rounded-md hover:bg-slate-800 text-slate-400 hover:text-cyan-400"><i data-lucide="rotate-cw" class="w-4 h-4"></i></button>
+                <button onclick="openOverrideModal(${t.id})" title="Manual Override" class="p-1.5 rounded-md hover:bg-slate-800 text-slate-400 hover:text-white"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                <button onclick="deleteTargetItem(${t.id})" title="Delete target" class="p-1.5 rounded-md hover:bg-slate-800 text-slate-400 hover:text-rose-400"><i data-lucide="trash" class="w-4 h-4"></i></button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function getStatusBadge(status) {
+      const map = {
+        'Verified Live': 'bg-emerald-950/80 text-emerald-300 border-emerald-800/80',
+        'Submitted': 'bg-cyan-950/80 text-cyan-300 border-cyan-800/80',
+        'Pending Editorial Review': 'bg-amber-950/60 text-amber-300 border-amber-800/60',
+        'Registered & Submitted': 'bg-blue-950/80 text-blue-300 border-blue-800/80',
+        'Needs Approval': 'bg-amber-950/90 text-amber-300 border-amber-800 animate-pulse font-semibold',
+        'Draft Ready': 'bg-indigo-950/80 text-indigo-300 border-indigo-800/80',
+        'Ready to Submit': 'bg-emerald-950/80 text-emerald-300 border-emerald-700',
+        'Awaiting Editorial Reply': 'bg-purple-950/80 text-purple-300 border-purple-800/80',
+        'Approved by Editor': 'bg-emerald-950 text-emerald-400 border-emerald-600 font-semibold',
+        'Analyzing': 'bg-cyan-950/80 text-cyan-400 border-cyan-800 animate-pulse',
+        'Pending Analysis': 'bg-slate-900 text-slate-400 border-slate-800',
+        'Pending': 'bg-slate-900 text-slate-400 border-slate-800',
+        'Manual Required': 'bg-amber-950/80 text-amber-300 border-amber-800/80',
+        'Failed - 403': 'bg-rose-950/80 text-rose-300 border-rose-800/80',
+        'Failed - Captcha': 'bg-rose-950/80 text-rose-300 border-rose-800/80',
+        'Rejected': 'bg-rose-950 text-rose-400 border-rose-800 line-through',
+        'Skipped': 'bg-slate-900 text-slate-500 border-slate-800',
+      };
+      const cls = map[status] || 'bg-slate-800 text-slate-400 border-slate-700';
+      return `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium border ${cls}">${status}</span>`;
+    }
+
+    function getWorkflowBadge(wf) {
+      if (!wf || wf === 'Pending') return `<span class="text-[10px] text-slate-500 font-mono">Unclassified</span>`;
+      if (wf.includes('Workflow A')) return `<span class="px-2 py-0.5 rounded bg-emerald-950/60 border border-emerald-800/60 text-emerald-400 text-[10px] font-mono font-medium">Route A: Direct</span>`;
+      if (wf.includes('Workflow B')) return `<span class="px-2 py-0.5 rounded bg-blue-950/60 border border-blue-800/60 text-blue-400 text-[10px] font-mono font-medium">Route B: Account</span>`;
+      if (wf.includes('Workflow C')) return `<span class="px-2 py-0.5 rounded bg-purple-950/60 border border-purple-800/60 text-purple-300 text-[10px] font-mono font-medium">Route C: Pitch</span>`;
+      if (wf.includes('Workflow D')) return `<span class="px-2 py-0.5 rounded bg-emerald-950 border border-emerald-600 text-emerald-300 text-[10px] font-mono font-semibold">Route D: Approved</span>`;
+      if (wf.includes('Workflow E')) return `<span class="px-2 py-0.5 rounded bg-amber-950/60 border border-amber-800/60 text-amber-400 text-[10px] font-mono font-medium">Route E: Review</span>`;
+      return `<span class="text-[10px] text-slate-400 font-mono">${wf}</span>`;
+    }
+
+    function togglePassword(id, realPw) {
+      const el = document.getElementById(`pw-${id}`);
+      if (!el) return;
+      if (el.textContent === '••••••••') {
+        el.textContent = realPw;
+      } else {
+        el.textContent = '••••••••';
+      }
+    }
+
+    // Select row handling
+    function toggleSelect(id) {
+      if (selectedIds.has(id)) selectedIds.delete(id);
+      else selectedIds.add(id);
+      updateBulkUi();
+      renderTargets();
+    }
+
+    function toggleSelectAll(e) {
+      if (e.target.checked) {
+        targets.forEach(t => selectedIds.add(t.id));
+      } else {
+        selectedIds.clear();
+      }
+      updateBulkUi();
+      renderTargets();
+    }
+
+    function updateBulkUi() {
+      const el = document.getElementById('bulk-actions');
+      const countEl = document.getElementById('selected-count');
+      if (selectedIds.size > 0) {
+        el.classList.remove('hidden');
+        countEl.textContent = `${selectedIds.size} selected`;
+      } else {
+        el.classList.add('hidden');
+      }
+    }
+
+    async function runSelected() {
+      if (selectedIds.size === 0) return;
+      await fetch('/api/automation/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: Array.from(selectedIds) })
+      });
+      selectedIds.clear();
+      updateBulkUi();
+      openLogsModal();
+    }
+
+    async function deleteSelected() {
+      if (!confirm(`Delete ${selectedIds.size} selected targets?`)) return;
+      await fetch('/api/targets/bulk-delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(Array.from(selectedIds))
+      });
+      selectedIds.clear();
+      updateBulkUi();
+      loadTargets();
+      loadStats();
+    }
+
+    async function clearAllTargets() {
+      if (!confirm('Are you sure you want to clear ALL targets from the database queue?')) return;
+      await fetch('/api/targets', { method: 'DELETE' });
+      selectedIds.clear();
+      updateBulkUi();
+      loadTargets();
+      loadStats();
+    }
+
+    async function deleteTargetItem(id) {
+      await fetch(`/api/targets/${id}`, { method: 'DELETE' });
+      selectedIds.delete(id);
+      updateBulkUi();
+      loadTargets();
+      loadStats();
+    }
+
+    async function retryTarget(id) {
+      await fetch(`/api/automation/retry/${id}`, { method: 'POST' });
+      openLogsModal();
+    }
+
+    async function verifyLive(id) {
+      const res = await fetch(`/api/automation/verify/${id}`, { method: 'POST' });
+      const data = await res.json();
+      if (data.ok) {
+        alert('✓ Backlink verified LIVE on the live post URL!');
+      } else {
+        alert('Backlink was not found in page HTML.');
+      }
+      loadTargets();
+      loadStats();
+    }
+
+    // Analysis Modal
+    function openAnalysisModal(id) {
+      const t = targets.find(item => item.id === id);
+      if (!t || !t.analysis_report_parsed) return;
+      const rep = t.analysis_report_parsed;
+
+      document.getElementById('analysis-modal-title').textContent = `Reconnaissance Report: ${t.website_name || t.website_url}`;
+      document.getElementById('rep-target-url').textContent = t.website_url;
+      
+      const gUrl = rep.guidelines_url || t.website_url;
+      document.getElementById('rep-guidelines-url').href = gUrl;
+      document.getElementById('rep-guidelines-url-text').textContent = gUrl.replace(/^https?:\/\//, '').slice(0, 40);
+
+      document.getElementById('rep-niche').textContent = rep.niche_detected || 'General';
+      document.getElementById('rep-audience').textContent = rep.audience || 'General Readers';
+      
+      const pEl = document.getElementById('rep-pricing');
+      pEl.textContent = (rep.pricing_type || 'Unclear').toUpperCase();
+      pEl.className = `font-semibold text-sm ${rep.pricing_type === 'free' ? 'text-emerald-400' : (rep.pricing_type === 'paid' ? 'text-amber-400' : 'text-slate-300')}`;
+      document.getElementById('rep-pricing-desc').textContent = rep.pricing_details || '';
+
+      document.getElementById('rep-words').textContent = `${rep.word_count_min || 800} - ${rep.word_count_max || 1500} words`;
+      
+      const aiEl = document.getElementById('rep-ai');
+      aiEl.textContent = (rep.ai_policy || 'Unspecified').toUpperCase();
+      aiEl.className = `font-semibold text-sm ${rep.ai_policy === 'disallowed' ? 'text-rose-400' : 'text-slate-300'}`;
+
+      document.getElementById('rep-workflow').textContent = rep.recommended_workflow || t.workflow || 'Workflow A';
+      document.getElementById('rep-confidence').textContent = `Confidence: ${Math.round((rep.confidence_score || 0.8) * 100)}%`;
+      document.getElementById('rep-backlink-policy').textContent = `Policy: ${rep.backlink_policy || 'Standard contextual links'}`;
+
+      const evList = document.getElementById('rep-evidence-list');
+      if (rep.evidence_snippets && rep.evidence_snippets.length > 0) {
+        evList.innerHTML = rep.evidence_snippets.map(s => `<div class="p-1.5 rounded bg-slate-900 border border-slate-800">"${s}"</div>`).join('');
+      } else {
+        evList.innerHTML = '<span class="text-slate-500">// Direct submission form identified on page without fee restrictions.</span>';
+      }
+
+      document.getElementById('analysis-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeAnalysisModal() {
+      document.getElementById('analysis-modal').classList.add('hidden');
+    }
+
+    // Review & Approval Modal
+    async function openReviewModal(id) {
+      const t = targets.find(item => item.id === id);
+      if (!t) return;
+
+      document.getElementById('rev-target-id').value = t.id;
+      document.getElementById('rev-modal-subtitle').textContent = `Campaign Review for ${t.website_url}`;
+      document.getElementById('rev-badge-workflow').textContent = t.workflow || 'Workflow A';
+
+      // Load or generate content if missing
+      let title = t.generated_article_title || '';
+      let body = t.generated_article_body || '';
+      let pitchSubj = t.generated_pitch_subject || '';
+      let pitchBody = t.generated_pitch_body || '';
+
+      if (!body) {
+        const cRes = await fetch(`/api/targets/${id}/content`);
+        const cData = await cRes.json();
+        title = cData.title;
+        body = cData.body;
+        pitchSubj = cData.pitch_subject;
+        pitchBody = cData.pitch_body;
+      }
+
+      document.getElementById('rev-art-title').value = title;
+      document.getElementById('rev-art-body').value = body;
+      document.getElementById('rev-pitch-subject').value = pitchSubj;
+      document.getElementById('rev-pitch-body').value = pitchBody;
+
+      const wc = body ? body.split(/\s+/).length : 0;
+      document.getElementById('rev-word-count').textContent = `${wc} words`;
+
+      document.getElementById('rev-client-notes').value = t.approval_notes || '';
+
+      // Banner text based on status
+      const banner = document.getElementById('rev-banner-text');
+      if (t.workflow && t.workflow.includes('Workflow E')) {
+        banner.textContent = 'Hold Required: Paid submission fee or policy restriction detected.';
+      } else if (t.status === 'Needs Approval' || t.status === 'Draft Ready') {
+        banner.textContent = 'Action Required: Verify tailored article & backlink before dispatch.';
+      } else {
+        banner.textContent = `Status: ${t.status}. Content verified.`;
+      }
+
+      switchContentTab('article');
+      document.getElementById('review-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeReviewModal() {
+      document.getElementById('review-modal').classList.add('hidden');
+    }
+
+    async function saveContentEdits() {
+      const id = document.getElementById('rev-target-id').value;
+      const payload = {
+        title: document.getElementById('rev-art-title').value,
+        body: document.getElementById('rev-art-body').value,
+        pitch_subject: document.getElementById('rev-pitch-subject').value,
+        pitch_body: document.getElementById('rev-pitch-body').value,
+      };
+      await fetch(`/api/targets/${id}/content`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      alert('✓ Draft edits saved successfully.');
+      loadTargets();
+    }
+
+    async function approveCurrentTarget() {
+      const id = document.getElementById('rev-target-id').value;
+      const notes = document.getElementById('rev-client-notes').value;
+      
+      // Save any content edits first
+      await fetch(`/api/targets/${id}/content`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: document.getElementById('rev-art-title').value,
+          body: document.getElementById('rev-art-body').value,
+          pitch_subject: document.getElementById('rev-pitch-subject').value,
+          pitch_body: document.getElementById('rev-pitch-body').value,
+        })
+      });
+
+      await fetch(`/api/targets/${id}/approve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notes, execute_now: true })
+      });
+
+      closeReviewModal();
+      loadTargets();
+      loadStats();
+      openLogsModal();
+    }
+
+    async function rejectCurrentTarget() {
+      const id = document.getElementById('rev-target-id').value;
+      const notes = document.getElementById('rev-client-notes').value || 'Rejected by client during review.';
+      await fetch(`/api/targets/${id}/reject`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notes })
+      });
+      closeReviewModal();
+      loadTargets();
+      loadStats();
+    }
+
+    async function skipCurrentTarget() {
+      const id = document.getElementById('rev-target-id').value;
+      const reason = document.getElementById('rev-client-notes').value || 'Skipped by client request.';
+      await fetch(`/api/targets/${id}/skip`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason })
+      });
+      closeReviewModal();
+      loadTargets();
+      loadStats();
+    }
+
+    // Email Modal & Diagnostics
+    function toggleAdvancedEmailSettings() {
+      const el = document.getElementById('adv-email-settings');
+      const txt = document.getElementById('adv-toggle-text');
+      const isHidden = el.classList.contains('hidden');
+      el.classList.toggle('hidden');
+      txt.textContent = isHidden ? 'Hide Ports' : 'Show Ports';
+    }
+
+    function toggleAppPasswordVisibility() {
+      const inp = document.getElementById('em-app-password');
+      const eye = document.getElementById('em-pw-eye');
+      if (inp.type === 'password') {
+        inp.type = 'text';
+      } else {
+        inp.type = 'password';
+      }
+    }
+
+    async function openEmailModal() {
+      const res = await fetch('/api/config');
+      const cfg = await res.json();
+      
+      const emailAddr = cfg.default_email || cfg.smtp_user || '';
+      document.getElementById('em-email-address').value = emailAddr;
+      document.getElementById('em-app-password').value = cfg.smtp_pass || '';
+      document.getElementById('em-test-recipient').value = emailAddr;
+
+      document.getElementById('em-smtp-host').value = cfg.smtp_host || 'smtp.gmail.com';
+      document.getElementById('em-smtp-port').value = cfg.smtp_port || 587;
+      document.getElementById('em-imap-host').value = cfg.imap_host || 'imap.gmail.com';
+      document.getElementById('em-imap-port').value = cfg.imap_port || 993;
+      document.getElementById('em-auto-approve').checked = Boolean(cfg.auto_approve_free_submissions);
+
+      document.getElementById('test-results-card').classList.add('hidden');
+      document.getElementById('email-reply-msg').classList.add('hidden');
+
+      document.getElementById('email-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeEmailModal() {
+      document.getElementById('email-modal').classList.add('hidden');
+    }
+
+    async function saveEmailConfig() {
+      const emailAddr = document.getElementById('em-email-address').value.trim();
+      const appPass = document.getElementById('em-app-password').value.trim();
+
+      const payload = {
+        default_email: emailAddr,
+        smtp_user: emailAddr,
+        imap_user: emailAddr,
+        smtp_pass: appPass,
+        imap_pass: appPass,
+        smtp_host: document.getElementById('em-smtp-host').value.trim() || 'smtp.gmail.com',
+        smtp_port: parseInt(document.getElementById('em-smtp-port').value) || 587,
+        imap_host: document.getElementById('em-imap-host').value.trim() || 'imap.gmail.com',
+        imap_port: parseInt(document.getElementById('em-imap-port').value) || 993,
+        auto_approve_free_submissions: document.getElementById('em-auto-approve').checked ? 1 : 0,
+      };
+
+      await fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      alert('✓ Gmail outreach settings saved successfully.');
+      loadBusinessConfig();
+    }
+
+    async function runEmailDiagnosticTest() {
+      const btn = document.getElementById('btn-test-email');
+      const originalHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i><span>Testing Connection...</span>`;
+      lucide.createIcons();
+
+      // First save current inputs so tests use the latest values
+      await saveEmailConfigSilent();
+
+      const customRecipient = document.getElementById('em-test-recipient').value.trim();
+      
+      const card = document.getElementById('test-results-card');
+      card.classList.remove('hidden');
+
+      // Set pending state
+      setDiagnosticBadge('smtp-auth', 'Testing...', 'bg-slate-800 text-slate-400');
+      document.getElementById('msg-smtp-auth').textContent = 'Connecting via STARTTLS...';
+      
+      setDiagnosticBadge('smtp-send', 'Pending', 'bg-slate-800 text-slate-500');
+      document.getElementById('msg-smtp-send').textContent = 'Awaiting authentication...';
+
+      setDiagnosticBadge('imap-auth', 'Testing...', 'bg-slate-800 text-slate-400');
+      document.getElementById('msg-imap-auth').textContent = 'Connecting via SSL/TLS...';
+
+      setDiagnosticBadge('imap-read', 'Pending', 'bg-slate-800 text-slate-500');
+      document.getElementById('msg-imap-read').textContent = 'Awaiting mailbox access...';
+
+      const banner = document.getElementById('test-overall-banner');
+      banner.className = 'p-2.5 rounded-lg text-xs font-semibold flex items-center space-x-2 bg-slate-950 border border-slate-800 text-slate-300';
+      document.getElementById('test-overall-text').textContent = 'Executing real Gmail SMTP & IMAP handshake...';
+
+      try {
+        const res = await fetch('/api/email/test', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ recipient: customRecipient || null })
+        });
+        const data = await res.json();
+        const t = data.tests;
+
+        // 1. SMTP Auth
+        if (t.smtp_auth.success) {
+          setDiagnosticBadge('smtp-auth', `PASS (${t.smtp_auth.latency_ms}ms)`, 'bg-emerald-950 text-emerald-300 border border-emerald-800');
+          document.getElementById('msg-smtp-auth').textContent = t.smtp_auth.message;
+        } else {
+          setDiagnosticBadge('smtp-auth', 'FAILED', 'bg-rose-950 text-rose-300 border border-rose-800');
+          document.getElementById('msg-smtp-auth').textContent = t.smtp_auth.message;
+        }
+
+        // 2. SMTP Send
+        if (t.smtp_send.success) {
+          setDiagnosticBadge('smtp-send', 'DELIVERED', 'bg-emerald-950 text-emerald-300 border border-emerald-800');
+          document.getElementById('msg-smtp-send').textContent = t.smtp_send.message;
+        } else {
+          setDiagnosticBadge('smtp-send', 'FAILED', 'bg-rose-950 text-rose-300 border border-rose-800');
+          document.getElementById('msg-smtp-send').textContent = t.smtp_send.message;
+        }
+
+        // 3. IMAP Auth
+        if (t.imap_auth.success) {
+          setDiagnosticBadge('imap-auth', `PASS (${t.imap_auth.latency_ms}ms)`, 'bg-emerald-950 text-emerald-300 border border-emerald-800');
+          document.getElementById('msg-imap-auth').textContent = t.imap_auth.message;
+        } else {
+          setDiagnosticBadge('imap-auth', 'FAILED', 'bg-rose-950 text-rose-300 border border-rose-800');
+          document.getElementById('msg-imap-auth').textContent = t.imap_auth.message;
+        }
+
+        // 4. IMAP Read
+        if (t.imap_read.success) {
+          setDiagnosticBadge('imap-read', 'VERIFIED', 'bg-emerald-950 text-emerald-300 border border-emerald-800');
+          document.getElementById('msg-imap-read').textContent = t.imap_read.message;
+        } else {
+          setDiagnosticBadge('imap-read', 'FAILED', 'bg-rose-950 text-rose-300 border border-rose-800');
+          document.getElementById('msg-imap-read').textContent = t.imap_read.message;
+        }
+
+        // Overall banner
+        if (data.overall_success) {
+          banner.className = 'p-2.5 rounded-lg text-xs font-semibold flex items-center space-x-2 bg-emerald-950/80 border border-emerald-800 text-emerald-300';
+          document.getElementById('test-overall-text').textContent = '✓ All 4 Tests Passed! Gmail SMTP & IMAP integration is fully operational.';
+        } else {
+          banner.className = 'p-2.5 rounded-lg text-xs font-semibold flex items-center space-x-2 bg-rose-950/90 border border-rose-800 text-rose-300';
+          document.getElementById('test-overall-text').textContent = `❌ Test Failed: ${data.error_summary || 'One or more tests failed. Check error details below.'}`;
+        }
+      } catch (err) {
+        banner.className = 'p-2.5 rounded-lg text-xs font-semibold flex items-center space-x-2 bg-rose-950/90 border border-rose-800 text-rose-300';
+        document.getElementById('test-overall-text').textContent = `❌ Network / API Error: ${err.message}`;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+        lucide.createIcons();
+      }
+    }
+
+    function setDiagnosticBadge(idPrefix, text, cls) {
+      const badge = document.getElementById(`badge-${idPrefix}`);
+      badge.textContent = text;
+      badge.className = `px-1.5 py-0.5 rounded text-[10px] font-semibold ${cls}`;
+    }
+
+    async function saveEmailConfigSilent() {
+      const emailAddr = document.getElementById('em-email-address').value.trim();
+      const appPass = document.getElementById('em-app-password').value.trim();
+
+      const payload = {
+        default_email: emailAddr,
+        smtp_user: emailAddr,
+        imap_user: emailAddr,
+        smtp_pass: appPass,
+        imap_pass: appPass,
+        smtp_host: document.getElementById('em-smtp-host').value.trim() || 'smtp.gmail.com',
+        smtp_port: parseInt(document.getElementById('em-smtp-port').value) || 587,
+        imap_host: document.getElementById('em-imap-host').value.trim() || 'imap.gmail.com',
+        imap_port: parseInt(document.getElementById('em-imap-port').value) || 993,
+        auto_approve_free_submissions: document.getElementById('em-auto-approve').checked ? 1 : 0,
+      };
+
+      await fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    }
+
+    async function pollInboxReplies() {
+      const msgEl = document.getElementById('email-reply-msg');
+      msgEl.textContent = 'Connecting to IMAP mailbox and scanning unread responses...';
+      msgEl.classList.remove('hidden');
+
+      const res = await fetch('/api/email/check-replies', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        msgEl.textContent = `✓ Scan complete: ${data.matched_count} matching publisher responses associated with campaigns.`;
+        loadTargets();
+        loadStats();
+      } else {
+        msgEl.textContent = `Inbox check: ${data.message || data.error}`;
+      }
+    }
+
+    // Stats
+    async function loadStats() {
+      const res = await fetch('/api/stats');
+      const s = await res.json();
+      document.getElementById('stat-total').textContent = s.total;
+      document.getElementById('stat-pending').textContent = s.pending;
+      document.getElementById('stat-live').textContent = s.live;
+      document.getElementById('stat-submitted').textContent = s.submitted;
+      document.getElementById('stat-approvals').textContent = s.pending_approvals;
+      document.getElementById('stat-failed').textContent = s.failed;
+
+      const appPill = document.getElementById('approval-pill');
+      if (s.pending_approvals > 0) {
+        appPill.classList.remove('hidden');
+        document.getElementById('approval-badge-count').textContent = `${s.pending_approvals} Approval${s.pending_approvals > 1 ? 's' : ''} Waiting`;
+      } else {
+        appPill.classList.add('hidden');
+      }
+    }
+
+    // Automation Controls
+    async function startAutomation() {
+      const res = await fetch('/api/automation/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: null })
+      });
+      const data = await res.json();
+      openLogsModal();
+      pollStatus();
+    }
+
+    async function stopAutomation() {
+      await fetch('/api/automation/stop', { method: 'POST' });
+      pollStatus();
+    }
+
+    async function pollStatus() {
+      const res = await fetch('/api/automation/status');
+      const st = await res.json();
+      
+      const dot = document.getElementById('status-dot');
+      const text = document.getElementById('status-text');
+      const runBtn = document.getElementById('run-btn');
+      const stopBtn = document.getElementById('stop-btn');
+
+      if (st.is_running) {
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+        text.textContent = 'Engine Executing...';
+        runBtn.classList.add('hidden');
+        stopBtn.classList.remove('hidden');
+        document.getElementById('log-target-indicator').textContent = st.current_target_id ? `Target #${st.current_target_id}` : 'Active';
+        loadTargets();
+        loadStats();
+      } else {
+        dot.className = 'w-2 h-2 rounded-full bg-slate-500';
+        text.textContent = 'Engine Idle';
+        runBtn.classList.remove('hidden');
+        stopBtn.classList.add('hidden');
+        document.getElementById('log-target-indicator').textContent = 'Idle';
+      }
+    }
+
+    // SSE Real-time logs
+    function initSSE() {
+      try {
+        sseSource = new EventSource('/api/logs/stream');
+        sseSource.onmessage = (e) => {
+          const entry = JSON.parse(e.data);
+          appendLog(entry);
+        };
+      } catch (err) {
+        console.warn('SSE could not connect:', err);
+      }
+    }
+
+    function appendLog(entry) {
+      const feed = document.getElementById('terminal-feed');
+      const colors = {
+        'info': 'text-slate-300',
+        'success': 'text-emerald-400 font-semibold',
+        'warning': 'text-amber-300',
+        'error': 'text-rose-400 font-semibold',
+      };
+      const cls = colors[entry.level] || 'text-slate-300';
+      const div = document.createElement('div');
+      div.className = `flex space-x-2 ${cls}`;
+      div.innerHTML = `
+        <span class="text-slate-600 shrink-0">[${entry.timestamp || 'LOG'}]</span>
+        <span class="break-all">${entry.message}</span>
+      `;
+      feed.appendChild(div);
+      feed.scrollTop = feed.scrollHeight;
+    }
+
+    function clearTerminal() {
+      document.getElementById('terminal-feed').innerHTML = '<div class="text-slate-500">// Terminal Cleared.</div>';
+    }
+
+    function openLogsModal() {
+      document.getElementById('logs-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeLogsModal() {
+      document.getElementById('logs-modal').classList.add('hidden');
+    }
+
+    // Override Modal
+    function openOverrideModal(id) {
+      const t = targets.find(item => item.id === id);
+      if (!t) return;
+      document.getElementById('override-id').value = t.id;
+      document.getElementById('override-url-title').textContent = `Override: ${t.website_url}`;
+      document.getElementById('override-status').value = t.status;
+      document.getElementById('override-workflow').value = t.workflow || 'Workflow A (Direct)';
+      document.getElementById('override-username').value = t.username || '';
+      document.getElementById('override-password').value = t.password || '';
+      document.getElementById('override-live-url').value = t.live_post_url || '';
+      document.getElementById('override-log').value = t.error_log || '';
+      document.getElementById('override-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeOverrideModal() {
+      document.getElementById('override-modal').classList.add('hidden');
+    }
+
+    async function saveOverride() {
+      const id = document.getElementById('override-id').value;
+      const payload = {
+        status: document.getElementById('override-status').value,
+        workflow: document.getElementById('override-workflow').value,
+        username: document.getElementById('override-username').value.trim() || null,
+        password: document.getElementById('override-password').value.trim() || null,
+        live_post_url: document.getElementById('override-live-url').value.trim() || null,
+        error_log: document.getElementById('override-log').value.trim() || null,
+      };
+      await fetch(`/api/targets/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      closeOverrideModal();
+      loadTargets();
+      loadStats();
+    }
+
+    let searchTimeout = null;
+    function debounceSearch() {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        loadTargets();
+      }, 300);
+    }
+
+    // Prevent any auto-paste / auto-fill into search — only manual keyboard typing allowed
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchEl = document.getElementById('search-input');
+      if (searchEl) {
+        // Force clear on load — kill any browser auto-fill
+        searchEl.value = '';
+        // Block all paste attempts
+        searchEl.addEventListener('paste', e => e.preventDefault());
+        // Block drag-drop text
+        searchEl.addEventListener('drop', e => e.preventDefault());
+        // Double-check: clear again after tiny delay (some browsers auto-fill after DOMContentLoaded)
+        setTimeout(() => { searchEl.value = ''; }, 100);
+        setTimeout(() => { searchEl.value = ''; }, 500);
+      }
+      // Reset dropdowns
+      const wfFilter = document.getElementById('workflow-filter');
+      const stFilter = document.getElementById('status-filter');
+      if (wfFilter) wfFilter.value = 'All';
+      if (stFilter) stFilter.value = 'All';
+    });
+  </script>
+</body>
+</html>

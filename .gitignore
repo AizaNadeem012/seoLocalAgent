@@ -1,0 +1,33 @@
+# Environment variables and secrets
+.env
+.env.local
+.env.*.local
+
+# SQLite Database
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Python cache & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+
+# Playwright & Browsers
+.playwright/
+test-results/
+playwright-report/
+
+# OS and Editor artifacts
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
